@@ -2,213 +2,226 @@ import { useEffect, useState } from "react";
 
 function Dashboard() {
   const [logs, setLogs] = useState([]);
-  const [filterLevel, setFilterLevel] = useState("ALL");
-  const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("latest");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [onlyAnomaly, setOnlyAnomaly] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // -------------------------------
-  // Fetch logs from backend
-  // -------------------------------
   useEffect(() => {
+    setLoading(true);
     fetch("http://127.0.0.1:8000/api/logs/")
       .then(res => res.json())
-      .then(data => setLogs(data.results || []));
+      .then(data => {
+        setLogs(data.results || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
-  // -------------------------------
-  // Filtering + Sorting Logic
-  // -------------------------------
-  const filteredLogs = logs
-    .filter(log => {
-      // Level filter
-      if (filterLevel !== "ALL" && log.level !== filterLevel) return false;
+  const totalLogs = logs.length;
+  const anomaliesCount = logs.filter(l => l.anomaly === -1).length;
+  const errorsCount = logs.filter(l => l.level === "ERROR").length;
+  const anomalyPercent = totalLogs > 0 ? ((anomaliesCount / totalLogs) * 100).toFixed(1) : 0;
+  const errorPercent = totalLogs > 0 ? ((errorsCount / totalLogs) * 100).toFixed(1) : 0;
 
-      // Only anomalies toggle
-      if (onlyAnomaly && log.anomaly !== -1) return false;
+  const getSeverityColor = (severity) => {
+    if (severity > 0.7) return '#ff4b4b'; // Red
+    if (severity > 0.4) return '#ffb84d'; // Orange
+    return '#4caf50'; // Green
+  };
 
-      // Search filter
-      if (search && !log.message.toLowerCase().includes(search.toLowerCase()))
-        return false;
+  const getSeverityLabel = (severity) => {
+    if (severity > 0.7) return 'Critical';
+    if (severity > 0.4) return 'Medium';
+    return 'Low';
+  };
 
-      // Date filter
-      if (startDate && new Date(log.timestamp) < new Date(startDate))
-        return false;
-
-      if (endDate && new Date(log.timestamp) > new Date(endDate))
-        return false;
-
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortOrder === "latest")
-        return new Date(b.timestamp) - new Date(a.timestamp);
-      else
-        return new Date(a.timestamp) - new Date(b.timestamp);
-    });
-
-  // Stats
-  const totalLogs = filteredLogs.length;
-  const anomalies = filteredLogs.filter(l => l.anomaly === -1).length;
+  const getLevelBadgeStyle = (level) => {
+    const colors = {
+      'ERROR': '#ff4b4b',
+      'WARNING': '#ffb84d',
+      'INFO': '#4caf50',
+      'DEBUG': '#2196F3',
+    };
+    return {
+      background: colors[level] || '#999',
+      color: 'white',
+      padding: '4px 8px',
+      borderRadius: '4px',
+      fontSize: '10px',
+      fontWeight: '600'
+    };
+  };
 
   return (
-    <div className="container mt-4">
-
-      {/* TITLE */}
-      <h2 className="text-white mb-4">📊 Dashboard</h2>
-
-      {/* ---------------- FILTERS ---------------- */}
-      <div className="mb-3 text-white">
-
-        {/* Level Filter */}
-        <label>Level:</label>
-        <select
-          className="form-select w-auto d-inline ms-2"
-          onChange={(e) => setFilterLevel(e.target.value)}
-        >
-          <option value="ALL">All</option>
-          <option value="INFO">INFO</option>
-          <option value="WARNING">WARNING</option>
-          <option value="ERROR">ERROR</option>
-        </select>
-
-        {/* Only anomaly toggle */}
-        <label className="ms-3">
-          <input
-            type="checkbox"
-            onChange={(e) => setOnlyAnomaly(e.target.checked)}
-          /> Only Anomalies
-        </label>
+    <div style={{ padding: '25px', maxWidth: '1400px', margin: '0 auto' }}>
+      {/* ALERT BAR */}
+      <div style={{
+        background: 'linear-gradient(135deg, #ee2a68 0%, #ff4b7d 100%)',
+        borderRadius: '15px',
+        padding: '20px',
+        marginBottom: '25px',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        boxShadow: '0 8px 24px rgba(238, 42, 104, 0.25)'
+      }}>
+        <span style={{ fontSize: '24px' }}>📊</span>
+        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700' }}>LDS Dashboard</h2>
       </div>
 
-      {/* ---------------- SEARCH + DATE + SORT ---------------- */}
-      <div className="row mb-3">
-
-        {/* Search */}
-        <div className="col-md-3">
-          <input
-            type="text"
-            placeholder="Search logs..."
-            className="form-control"
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* Start Date */}
-        <div className="col-md-3">
-          <input
-            type="date"
-            className="form-control"
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-
-        {/* End Date */}
-        <div className="col-md-3">
-          <input
-            type="date"
-            className="form-control"
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-
-        {/* Sort */}
-        <div className="col-md-3">
-          <select
-            className="form-select"
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="latest">Latest First</option>
-            <option value="oldest">Oldest First</option>
-          </select>
-        </div>
-
-      </div>
-
-      {/* ---------------- STATS ---------------- */}
-      <div className="row mb-4">
-        <div className="col-md-6">
-          <div className="card p-3 shadow">
-            <h5>Total Logs</h5>
-            <h3>{totalLogs}</h3>
+      {/* SUMMARY CARDS */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        {/* Total Logs Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: '15px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 8px 24px rgba(102, 126, 234, 0.2)'
+        }}>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>
+            TOTAL LOGS
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+            {totalLogs}
+          </div>
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+            All system logs
           </div>
         </div>
 
-        <div className="col-md-6">
-          <div className="card p-3 shadow">
-            <h5>Anomalies</h5>
-            <h3 className="text-danger">{anomalies}</h3>
+        {/* Anomalies Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, #ee2a68 0%, #ff4b7d 100%)',
+          borderRadius: '15px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 8px 24px rgba(238, 42, 104, 0.2)'
+        }}>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>
+            ANOMALIES DETECTED
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+            {anomaliesCount}
+          </div>
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+            {anomalyPercent}% of logs
+          </div>
+        </div>
+
+        {/* Errors Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          borderRadius: '15px',
+          padding: '20px',
+          color: 'white',
+          boxShadow: '0 8px 24px rgba(245, 87, 108, 0.2)'
+        }}>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', marginBottom: '8px' }}>
+            ERROR COUNT
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+            {errorsCount}
+          </div>
+          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+            {errorPercent}% of logs
           </div>
         </div>
       </div>
 
-      {/* ---------------- TABLE ---------------- */}
-      <div className="card p-3 shadow">
+      {/* RECENT LOGS TABLE */}
+      <div style={{
+        background: 'white',
+        borderRadius: '15px',
+        padding: '25px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+        border: '1px solid rgba(0, 0, 0, 0.05)'
+      }}>
+        <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: '600', color: '#333' }}>
+          📋 Recent Logs
+        </h3>
 
-        <table className="table table-hover">
-
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Level</th>
-              <th>Message</th>
-              <th>Status</th>
-              <th>Severity</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredLogs.map((log, index) => (
-              <tr
-                key={index}
-                className={
-                  log.level === "ERROR"
-                    ? "table-danger"
-                    : log.level === "WARNING"
-                    ? "table-warning"
-                    : ""
-                }
-              >
-
-                {/* TIME */}
-                <td>{log.timestamp}</td>
-
-                {/* LEVEL (COLORED BADGE) */}
-                <td>
-                  <span
-                    className={
-                      log.level === "ERROR"
-                        ? "badge bg-danger"
-                        : log.level === "WARNING"
-                        ? "badge bg-warning text-dark"
-                        : "badge bg-success"
-                    }
+        {loading ? (
+          <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>Loading logs...</p>
+        ) : logs.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#999', padding: '40px 0' }}>No logs available</p>
+        ) : (
+          <div style={{
+            overflowX: 'auto',
+            borderRadius: '10px',
+            border: '1px solid rgba(0, 0, 0, 0.08)'
+          }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '13px'
+            }}>
+              <thead>
+                <tr style={{ background: 'rgba(238, 42, 104, 0.08)', borderBottom: '2px solid #ee2a68' }}>
+                  <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Timestamp</th>
+                  <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Level</th>
+                  <th style={{ padding: '14px 12px', textAlign: 'left', fontWeight: '600', color: '#333' }}>Message</th>
+                  <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '600', color: '#333' }}>Anomaly</th>
+                  <th style={{ padding: '14px 12px', textAlign: 'center', fontWeight: '600', color: '#333' }}>Severity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.slice(0, 10).map((log, idx) => (
+                  <tr 
+                    key={idx}
+                    style={{
+                      borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+                      background: log.anomaly === -1 ? 'rgba(238, 42, 104, 0.05)' : 'white',
+                      transition: 'background 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = log.anomaly === -1 ? 'rgba(238, 42, 104, 0.12)' : 'rgba(0, 0, 0, 0.02)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = log.anomaly === -1 ? 'rgba(238, 42, 104, 0.05)' : 'white';
+                    }}
                   >
-                    {log.level}
-                  </span>
-                </td>
-
-                {/* MESSAGE */}
-                <td>{log.message}</td>
-
-                {/* STATUS */}
-                <td>
-                  {log.anomaly === -1 ? "🚨 Anomaly" : "Normal"}
-                </td>
-
-                {/* SEVERITY */}
-                <td>{log.severity?.toFixed(3)}</td>
-
-              </tr>
-            ))}
-          </tbody>
-
-        </table>
-
+                    <td style={{ padding: '12px', color: '#555' }}>
+                      {new Date(log.timestamp).toLocaleString()}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <span style={getLevelBadgeStyle(log.level)}>
+                        {log.level}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px', color: '#666', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {log.message}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'center', color: log.anomaly === -1 ? '#ee2a68' : '#4caf50', fontWeight: '600' }}>
+                      {log.anomaly === -1 ? '🚨 Yes' : '✓ No'}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'center' }}>
+                      <span style={{
+                        background: getSeverityColor(log.severity),
+                        color: 'white',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        display: 'inline-block'
+                      }}>
+                        {getSeverityLabel(log.severity)} ({(log.severity * 100).toFixed(0)}%)
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
     </div>
   );
 }

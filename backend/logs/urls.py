@@ -1,7 +1,9 @@
-from django.urls import path
-from .views import upload_file, get_logs
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path("upload/", upload_file),
-    path("logs/", get_logs),  # 🔥 NEW API
+    path('admin/', admin.site.urls),
+
+    # ✅ THIS FIXES EVERYTHING
+    path('api/', include('core.api_urls')),
 ]
