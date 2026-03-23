@@ -1,0 +1,47 @@
+body {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* NAVBAR */
+.custom-navbar {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+  margin-left: 15px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.nav-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* CARDS  */
+.card {
+  background: rgba(255,255,255,0.05) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(12px);
+  color: white;
+}
+
+/* TABLE */
+.table {
+  color: white;
+}
+
+.table tr:hover {
+  background: rgba(255,255,255,0.05);
+}

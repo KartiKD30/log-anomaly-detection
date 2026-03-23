@@ -1,0 +1,4 @@
+2026-03-21 10:00:01 INFO User logged in
+2026-03-21 10:01:05 ERROR Database connection failed
+2026-03-21 10:02:10 WARNING Disk usage high
+2026-03-21 10:03:22 INFO Request processed
