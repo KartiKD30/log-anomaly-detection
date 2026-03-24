@@ -306,3 +306,12 @@ tr:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Row colors */
+.row-error {
+  background: rgba(255, 0, 0, 0.15);
+}
+
+.row-warning {
+  background: rgba(255, 193, 7, 0.2);
+}

@@ -1,9 +1,10 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from .views import login_with_otp, verify_otp, upload_file, get_logs
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("login-otp/", login_with_otp),
+    path("verify-otp/", verify_otp),
 
-    # ✅ THIS FIXES EVERYTHING
-    path('api/', include('core.api_urls')),
+    path("upload/", upload_file),
+    path("logs/", get_logs),
 ]

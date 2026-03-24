@@ -1,10 +1,14 @@
+import json
+import random
+import datetime
+import re
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
 
 import pandas as pd
 import numpy as np
-import datetime
-import re
 
 from sklearn.ensemble import IsolationForest
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -13,10 +17,63 @@ from .mongo import collection
 from bson import ObjectId
 
 
+# =========================
+# STORAGE
+# =========================
+users = {}
+otp_store = {}
+
+
+# =========================
+# LOGIN WITH OTP 
+# =========================
+@csrf_exempt
+def login_with_otp(request):
+    data = json.loads(request.body)
+    email = data.get("email")
+
+    # auto-create user if not exists
+    if email not in users:
+        users[email] = True
+
+    otp = str(random.randint(100000, 999999))
+    otp_store[email] = otp
+
+    send_mail(
+        "Login OTP",
+        f"Your OTP is {otp}",
+        None,
+        [email],
+        fail_silently=False,
+    )
+
+    return JsonResponse({"message": "OTP sent"})
+
+
+# =========================
+# VERIFY OTP → LOGIN SUCCESS
+# =========================
+@csrf_exempt
+def verify_otp(request):
+    data = json.loads(request.body)
+
+    email = data.get("email")
+    otp = data.get("otp")
+
+    if otp_store.get(email) == otp:
+        del otp_store[email]
+        return JsonResponse({"success": True})
+    else:
+        return JsonResponse({"error": "Invalid OTP"}, status=400)
+
+
+# =========================
+# LOG UPLOAD (ML)
+# =========================
 @csrf_exempt
 def upload_file(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Only POST method allowed"}, status=405)
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
 
     file = request.FILES.get("file")
 
@@ -66,7 +123,7 @@ def upload_file(request):
     df = pd.DataFrame(data)
 
     if df.empty:
-        return JsonResponse({"error": "No valid data found"}, status=400)
+        return JsonResponse({"error": "No valid data"}, status=400)
 
     vectorizer = TfidfVectorizer()
     text_features = vectorizer.fit_transform(df["message"]).toarray()
@@ -75,17 +132,12 @@ def upload_file(request):
 
     X = np.hstack((numeric_features, text_features))
 
-    model = IsolationForest(
-        contamination=0.05,
-        random_state=42
-    )
-
+    model = IsolationForest(contamination=0.05, random_state=42)
     df["anomaly"] = model.fit_predict(X)
 
     df.loc[df["level"] == "ERROR", "anomaly"] = -1
 
     scores = model.decision_function(X)
-
     df["severity"] = -scores
 
     df["severity"] = (df["severity"] - df["severity"].min()) / (
@@ -94,12 +146,17 @@ def upload_file(request):
 
     results = df.to_dict(orient="records")
 
+    collection.delete_many({})
+
     for log in results:
         collection.insert_one(dict(log))
 
     return JsonResponse({"results": results})
 
 
+# =========================
+# GET LOGS
+# =========================
 def get_logs(request):
     logs = list(collection.find().limit(1000))
 

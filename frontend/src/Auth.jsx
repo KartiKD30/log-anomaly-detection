@@ -2,14 +2,38 @@ import { useState } from "react";
 import "./App.css";
 
 function Auth({ onLogin }) {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [otpStep, setOtpStep] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email && otp) {
+  const handleLogin = async () => {
+    const res = await fetch("http://127.0.0.1:8000/api/login-otp/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email }),
+    });
+
+    if (res.ok) {
+      alert("OTP sent");
+      setOtpStep(true);
+    } else {
+      alert("Error sending OTP");
+    }
+  };
+
+  const verifyOtp = async () => {
+    const res = await fetch("http://127.0.0.1:8000/api/verify-otp/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
       onLogin();
+    } else {
+      alert("Invalid OTP");
     }
   };
 
@@ -22,7 +46,6 @@ function Auth({ onLogin }) {
       background: 'linear-gradient(135deg, #ee2a68 0%, #ff4b7d 100%)',
       padding: '20px'
     }}>
-
       <div style={{
         width: '100%',
         maxWidth: '420px',
@@ -32,8 +55,6 @@ function Auth({ onLogin }) {
         boxShadow: '0 20px 60px rgba(238, 42, 104, 0.3)',
         textAlign: 'center'
       }}>
-
-        {/* LOGO */}
         <div style={{
           fontSize: '60px',
           marginBottom: '20px'
@@ -55,7 +76,7 @@ function Auth({ onLogin }) {
           marginBottom: '30px',
           fontSize: '14px'
         }}>
-          Log Anomaly Detection System
+          Log Detection System
         </p>
 
         <h2 style={{
@@ -64,137 +85,118 @@ function Auth({ onLogin }) {
           marginBottom: '20px',
           color: '#333'
         }}>
-          {isLogin ? "Welcome Back!" : "Create Account"}
+          {otpStep ? "Verify OTP" : "Welcome Back!"}
         </h2>
 
-        <form onSubmit={handleSubmit}>
-          {/* EMAIL INPUT */}
-          <input
-            type="email"
-            placeholder="📧 Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              marginBottom: '16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '10px',
-              fontSize: '14px',
-              fontFamily: 'inherit',
-              transition: 'all 0.3s ease',
-              boxSizing: 'border-box'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ee2a68';
-              e.target.style.boxShadow = '0 0 0 3px rgba(238, 42, 104, 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#e0e0e0';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
+        {!otpStep ? (
+          <>
+            <input
+              type="email"
+              placeholder="📧 Enter your email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                marginBottom: '24px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                transition: 'all 0.3s ease',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ee2a68';
+                e.target.style.boxShadow = '0 0 0 3px rgba(238, 42, 104, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e0e0e0';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
 
-          {/* OTP INPUT */}
-          <input
-            type="text"
-            placeholder="🔐 Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              marginBottom: '24px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '10px',
-              fontSize: '14px',
-              fontFamily: 'inherit',
-              transition: 'all 0.3s ease',
-              boxSizing: 'border-box'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ee2a68';
-              e.target.style.boxShadow = '0 0 0 3px rgba(238, 42, 104, 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#e0e0e0';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-
-          {/* SUBMIT BUTTON */}
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              background: 'linear-gradient(135deg, #ee2a68, #ff4b7d)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '15px',
-              fontWeight: '600',
-              cursor: email && otp ? 'pointer' : 'not-allowed',
-              transition: 'all 0.3s ease',
-              marginBottom: '20px',
-              opacity: email && otp ? 1 : 0.6
-            }}
-            onMouseEnter={(e) => {
-              if (email && otp) {
+            <button
+              onClick={handleLogin}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'linear-gradient(135deg, #ee2a68 0%, #ff4b7d 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
                 e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 12px 24px rgba(238, 42, 104, 0.3)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = 'none';
-            }}
-            disabled={!email || !otp}
-          >
-            {isLogin ? '🚀 Login' : '✨ Register'}
-          </button>
-        </form>
+                e.target.style.boxShadow = '0 10px 20px rgba(238, 42, 104, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              Send OTP
+            </button>
+          </>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="🔐 Enter OTP"
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                marginBottom: '24px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                transition: 'all 0.3s ease',
+                boxSizing: 'border-box'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ee2a68';
+                e.target.style.boxShadow = '0 0 0 3px rgba(238, 42, 104, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e0e0e0';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
 
-        {/* TOGGLE AUTH */}
-        <p style={{
-          color: '#999',
-          fontSize: '14px',
-          margin: '20px 0 0 0'
-        }}>
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <span
-            onClick={() => setIsLogin(!isLogin)}
-            style={{
-              color: '#ee2a68',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              textDecoration: 'none'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.textDecoration = 'underline';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.textDecoration = 'none';
-            }}
-          >
-            {isLogin ? 'Sign up' : 'Login'}
-          </span>
-        </p>
-
-        {/* DEMO CREDENTIALS */}
-        <div style={{
-          marginTop: '30px',
-          paddingTop: '20px',
-          borderTop: '1px solid #f0f0f0',
-          fontSize: '12px',
-          color: '#999'
-        }}>
-          <p style={{ margin: '0 0 8px 0' }}>Demo Credentials:</p>
-          <p style={{ margin: '0 0 4px 0' }}>Email: demo@example.com</p>
-          <p style={{ margin: 0 }}>OTP: 123456</p>
-        </div>
-
+            <button
+              onClick={verifyOtp}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'linear-gradient(135deg, #ee2a68 0%, #ff4b7d 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 10px 20px rgba(238, 42, 104, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              Verify OTP
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

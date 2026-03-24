@@ -1,111 +1,190 @@
-# API Documentation - LDS Log Anomaly Detection System
+# API Documentation
+
+**Log Anomaly Detection System (LDS)**
 
 ---
 
-## 🔹 Base URL
+## 📌 Overview
 
+This document describes the REST API endpoints used in the Log Anomaly Detection System. The APIs are responsible for handling authentication, log processing, and data retrieval.
+
+**Base URL:**
+
+```text
 http://127.0.0.1:8000/api/
-
+```
 
 ---
 
-## 📤 1. Upload Log File
+## 🔐 Authentication APIs (OTP-Based)
 
-### Endpoint:
+### 1. Send OTP (Login)
 
+**Endpoint:**
+
+```text
+POST /login-otp/
+```
+
+**Description:**
+Generates a one-time password (OTP) and sends it to the user’s email address.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "OTP sent"
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "error": "User not found"
+}
+```
+
+---
+
+### 2. Verify OTP
+
+**Endpoint:**
+
+```text
+POST /verify-otp/
+```
+
+**Description:**
+Validates the OTP entered by the user. On successful verification, login is granted.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "error": "Invalid OTP"
+}
+```
+
+---
+
+## 📂 Log Processing APIs
+
+### 3. Upload Log File
+
+**Endpoint:**
+
+```text
 POST /upload/
+```
 
+**Description:**
+Uploads and processes a log file. The backend parses the logs, extracts features, applies machine learning, and stores results in the database.
 
-### Description:
-Uploads a log file, processes it using the parsing engine and machine learning model, and stores results in MongoDB.
+**Request:**
 
----
+* Type: `multipart/form-data`
+* Key: `file`
 
-### Request:
-- Method: POST
-- Content-Type: multipart/form-data
+**Response:**
 
----
-
-### Body Parameters:
-| Parameter | Type | Description |
-|----------|------|------------|
-| file     | File | Log file |
-
----
-
-### Response:
-
+```json
 {
-"results": [
-{
-"timestamp": "2026-03-21 10:01:05",
-"level": "ERROR",
-"message": "Database connection failed",
-"anomaly": -1,
-"severity": 0.78
+  "results": [
+    {
+      "timestamp": "2024-01-01 12:00:00",
+      "level": "ERROR",
+      "message": "Error occurred",
+      "anomaly": -1,
+      "severity": 0.85
+    }
+  ]
 }
-]
-}
-
+```
 
 ---
 
-## 📥 2. Get Logs
+### 4. Get Processed Logs
 
-### Endpoint:
+**Endpoint:**
 
+```text
 GET /logs/
+```
 
+**Description:**
+Retrieves processed log data from the database.
 
-### Description:
-Fetches all processed logs from MongoDB.
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "timestamp": "2024-01-01 12:00:00",
+      "level": "INFO",
+      "message": "Service started",
+      "anomaly": 1,
+      "severity": 0.12
+    }
+  ]
+}
+```
 
 ---
 
-### Response:
+## 🧠 Response Fields
 
-{
-"results": [
-{
-"_id": "abc123",
-"timestamp": "2026-03-21 10:01:05",
-"level": "INFO",
-"message": "User login successful",
-"anomaly": 1,
-"severity": 0.02
-}
-]
-}
-
+| Field     | Description                       |
+| --------- | --------------------------------- |
+| timestamp | Date and time of log entry        |
+| level     | Log level (INFO, WARNING, ERROR)  |
+| message   | Log message                       |
+| anomaly   | -1 = anomaly, 1 = normal          |
+| severity  | Normalized anomaly score (0 to 1) |
 
 ---
 
-## ⚠️ Error Handling
+## ⚠️ Notes
 
-### Example Errors:
-
-{
-"error": "No file uploaded"
-}
-
-{
-"error": "No valid data"
-}
-
+* OTP is stored temporarily in memory
+* No authentication token is required (basic implementation)
+* APIs are open for demonstration purposes
+* Email delivery depends on SMTP configuration
 
 ---
 
-## 🧠 System Notes
-- APIs follow REST architecture
-- Stateless communication
-- JSON-based responses
-- Designed to handle large log datasets
-- Integrated with machine learning model
+## 🚀 Future Enhancements
+
+* JWT-based authentication
+* Token-protected APIs
+* OTP expiration and retry limits
+* Rate limiting for security
+* HTTPS-based secure communication
 
 ---
-
-## 🔐 Assumptions
-- Log format follows timestamp + level + message
-- Backend server is running locally
-- MongoDB is connected

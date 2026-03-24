@@ -1,22 +1,27 @@
 # LDS - Log Anomaly Detection System
 
+---
+
 ## 📌 Project Overview
+
 LDS (Log Anomaly Detection System) is a full-stack application designed to analyze large volumes of system logs and detect anomalies using machine learning techniques. The system processes structured and semi-structured log files, identifies abnormal patterns, and provides insights through a dynamic dashboard.
 
-This project demonstrates the integration of backend processing, machine learning, database management, and frontend visualization.
+The project demonstrates integration of backend processing, machine learning, database management, and frontend visualization in a scalable architecture.
 
 ---
 
 ## 🎯 Objectives
-- Automate log analysis
-- Detect anomalies in system logs
-- Reduce manual monitoring effort
-- Provide actionable insights through visualization
-- Handle real-world messy log data
+
+* Automate log analysis
+* Detect anomalies in system logs
+* Reduce manual monitoring effort
+* Provide actionable insights through visualization
+* Handle real-world unstructured log data
 
 ---
 
 ## 🏗 System Architecture
+
 Frontend (React Dashboard)
 ↓
 REST API (Django Backend)
@@ -25,429 +30,170 @@ Log Parsing Engine (Regex-based)
 ↓
 Feature Engineering (Numeric + Text)
 ↓
-Machine Learning Model (Isolation Forest)
+Machine Learning Model (Isolation Forest + TF-IDF)
 ↓
 MongoDB Database
 ↓
-Analytics & Alert System
+Analytics & Visualization Layer
 
+---
 
 ## ⚙️ Key Features
 
 ### 📂 Log Processing
-- Upload log files
-- Handles large datasets (1000+ logs)
-- Supports messy and merged logs
-- Regex-based parsing engine
+
+* Upload and process log files
+* Handles large datasets (1000+ logs)
+* Supports noisy and merged logs
+* Regex-based parsing
 
 ---
 
 ### 🤖 Machine Learning
-- Algorithm: Isolation Forest
-- Enhanced using TF-IDF text vectorization
-- Detects anomalies based on:
-  - Timestamp patterns
-  - Log severity levels
-  - Message content
-- Outputs:
-  - Anomaly label (-1 or 1)
-  - Severity score
+
+* Algorithm: Isolation Forest
+* Enhanced using TF-IDF vectorization
+* Detects anomalies using:
+
+  * Temporal patterns
+  * Log severity levels
+  * Message semantics
+
+Outputs:
+
+* Anomaly label (-1 or 1)
+* Severity score
 
 ---
 
 ### 📊 Dashboard & Analytics
-- Log volume over time
-- Error distribution
-- Service-level activity
-- Anomaly trend analysis
-- Search, filter, and sorting
-- Date range filtering
 
----
-
-### 🚨 Alert System
-- Displays anomaly alerts
-- Includes:
-  - Timestamp
-  - Affected service
-  - Severity score
-- Uses rule-based filtering to reduce false positives
+* Log distribution and trends
+* Error and anomaly visualization
+* Severity-based insights
+* Filtering (date, level)
+* Tabular exploration of logs
 
 ---
 
 ### 🗄 Database Design
+
 MongoDB is used for scalable storage.
 
 #### Schema:
 
+```
 {
-"timestamp": "YYYY-MM-DD HH:MM:SS",
-"level": "INFO | WARNING | ERROR",
-"message": "log message",
-"hour": integer,
-"level_num": integer,
-"anomaly": -1 or 1,
-"severity": float
+  "timestamp": "YYYY-MM-DD HH:MM:SS",
+  "level": "INFO | WARNING | ERROR",
+  "message": "log message",
+  "hour": integer,
+  "level_num": integer,
+  "anomaly": -1 or 1,
+  "severity": float
 }
-
+```
 
 ---
 
-## 🔌 API Architecture (REST)
+## 🔌 API Architecture
+
 The system follows RESTful principles:
-- Stateless communication
-- JSON responses
-- Separation of frontend and backend
+
+* Stateless communication
+* JSON-based responses
+* Clear separation of frontend and backend
+
+---
+
+## 🔗 API Endpoints
+
+### Authentication (Bonus Feature)
+
+#### POST /api/login-otp/
+
+Generates and sends OTP to user email.
+
+#### POST /api/verify-otp/
+
+Verifies OTP and allows login.
+
+---
+
+### Log Processing APIs
+
+#### POST /api/upload/
+
+Uploads log file and processes it.
+
+#### GET /api/logs/
+
+Fetches processed logs.
+
+---
+
+## 🔐 Authentication (Bonus Feature)
+
+The system includes an OTP-based authentication mechanism:
+
+* User enters email
+* System sends OTP via SMTP
+* OTP verification grants access
+
+This eliminates the need for password storage and demonstrates secure authentication concepts.
 
 ---
 
 ## ⚡ Non-Functional Requirements
 
 ### ✔ Scalability
-- MongoDB supports large datasets
-- Efficient batch processing using Pandas
+
+* MongoDB supports large datasets
+* Efficient batch processing
 
 ### ✔ Performance
-- Vectorized operations
-- ML model optimized for speed
+
+* Vectorized operations using NumPy and Pandas
+* Lightweight ML model
 
 ### ✔ Maintainability
-- Modular code structure
-- Separation of concerns:
-  - Parser
-  - ML model
-  - API
-  - UI
 
-### ✔ Error Handling
-- Try-catch blocks implemented
-- Meaningful API error responses
-- Logging for debugging
+* Modular architecture
+* Clear separation of concerns
+
+### ✔ Security
+
+* Environment variables for sensitive data
+* No hardcoded credentials
+* OTP-based authentication
 
 ---
 
-## 🛠 Tech Stack
+## ⚠️ Limitations
 
-### Frontend:
-- React.js
-- Bootstrap
-- Chart.js
-
-### Backend:
-- Django
-- Python
-
-### Database:
-- MongoDB
-
-### Machine Learning:
-- Isolation Forest
-- TF-IDF Vectorizer
-
----
-
-## 🔄 System Workflow
-1. User uploads log file
-2. Logs are parsed using regex
-3. Features are extracted (numeric + text)
-4. ML model detects anomalies
-5. Results stored in MongoDB
-6. Dashboard displays insights and alerts
-
----
-
-
-## 🚀 Future Improvements
-- Real-time log streaming
-- User authentication system
-- Export reports (PDF/CSV)
-- Integration with monitoring tools
-
----
-
-## 📌 Conclusion
-This project demonstrates a scalable and intelligent log analysis system combining machine 
-## ⚙️ Key Features
-
-### 📂 Log Processing
-- Upload log files
-- Handles large datasets (1000+ logs)
-- Supports messy and merged logs
-- Regex-based parsing engine
-
----
-
-### 🤖 Machine Learning
-- Algorithm: Isolation Forest
-- Enhanced using TF-IDF text vectorization
-- Detects anomalies based on:
-  - Timestamp patterns
-  - Log severity levels
-  - Message content
-- Outputs:
-  - Anomaly label (-1 or 1)
-  - Severity score
-
----
-
-### 📊 Dashboard & Analytics
-- Log volume over time
-- Error distribution
-- Service-level activity
-- Anomaly trend analysis
-- Search, filter, and sorting
-- Date range filtering
-
----
-
-### 🚨 Alert System
-- Displays anomaly alerts
-- Includes:
-  - Timestamp
-  - Affected service
-  - Severity score
-- Uses rule-based filtering to reduce false positives
-
----
-
-### 🗄 Database Design
-MongoDB is used for scalable storage.
-
-#### Schema:
-
-{
-"timestamp": "YYYY-MM-DD HH:MM:SS",
-"level": "INFO | WARNING | ERROR",
-"message": "log message",
-"hour": integer,
-"level_num": integer,
-"anomaly": -1 or 1,
-"severity": float
-}
-
-
----
-
-## 🔌 API Architecture (REST)
-The system follows RESTful principles:
-- Stateless communication
-- JSON responses
-- Separation of frontend and backend
-
----
-
-## ⚡ Non-Functional Requirements
-
-### ✔ Scalability
-- MongoDB supports large datasets
-- Efficient batch processing using Pandas
-
-### ✔ Performance
-- Vectorized operations
-- ML model optimized for speed
-
-### ✔ Maintainability
-- Modular code structure
-- Separation of concerns:
-  - Parser
-  - ML model
-  - API
-  - UI
-
-### ✔ Error Handling
-- Try-catch blocks implemented
-- Meaningful API error responses
-- Logging for debugging
-
----
-
-## 🛠 Tech Stack
-
-### Frontend:
-- React.js
-- Bootstrap
-- Chart.js
-
-### Backend:
-- Django
-- Python
-
-### Database:
-- MongoDB
-
-### Machine Learning:
-- Isolation Forest
-- TF-IDF Vectorizer
-
----
-
-## 🔄 System Workflow
-1. User uploads log file
-2. Logs are parsed using regex
-3. Features are extracted (numeric + text)
-4. ML model detects anomalies
-5. Results stored in MongoDB
-6. Dashboard displays insights and alerts
-
----
-
-## 📸 Screenshots
-(Add screenshots of:)
-- Dashboard
-- Analytics
-- Alerts
+* OTP stored in memory
+* No real-time streaming
+* Basic authentication (no JWT/session)
+* Limited log format support
 
 ---
 
 ## 🚀 Future Improvements
-- Real-time log streaming
-- User authentication system
-- Export reports (PDF/CSV)
-- Integration with monitoring tools
+
+* Real-time log streaming
+* JWT-based authentication
+* OTP expiration and rate limiting
+* Role-based access control
+* Integration with monitoring tools
 
 ---
 
 ## 📌 Conclusion
-This project demonstrates a scalable and intelligent log analysis system combining machine 
-## ⚙️ Key Features
 
-### 📂 Log Processing
-- Upload log files
-- Handles large datasets (1000+ logs)
-- Supports messy and merged logs
-- Regex-based parsing engine
+This project demonstrates a scalable and intelligent log analysis system combining machine learning with practical engineering solutions. It effectively detects anomalies and provides actionable insights for system monitoring, while maintaining a modular architecture for future enhancements.
 
 ---
 
-### 🤖 Machine Learning
-- Algorithm: Isolation Forest
-- Enhanced using TF-IDF text vectorization
-- Detects anomalies based on:
-  - Timestamp patterns
-  - Log severity levels
-  - Message content
-- Outputs:
-  - Anomaly label (-1 or 1)
-  - Severity score
+## 👨‍💻 Author
 
----
-
-### 📊 Dashboard & Analytics
-- Log volume over time
-- Error distribution
-- Service-level activity
-- Anomaly trend analysis
-- Search, filter, and sorting
-- Date range filtering
-
----
-
-### 🚨 Alert System
-- Displays anomaly alerts
-- Includes:
-  - Timestamp
-  - Affected service
-  - Severity score
-- Uses rule-based filtering to reduce false positives
-
----
-
-### 🗄 Database Design
-MongoDB is used for scalable storage.
-
-#### Schema:
-
-{
-"timestamp": "YYYY-MM-DD HH:MM:SS",
-"level": "INFO | WARNING | ERROR",
-"message": "log message",
-"hour": integer,
-"level_num": integer,
-"anomaly": -1 or 1,
-"severity": float
-}
-
-
----
-
-## 🔌 API Architecture (REST)
-The system follows RESTful principles:
-- Stateless communication
-- JSON responses
-- Separation of frontend and backend
-
----
-
-## ⚡ Non-Functional Requirements
-
-### ✔ Scalability
-- MongoDB supports large datasets
-- Efficient batch processing using Pandas
-
-### ✔ Performance
-- Vectorized operations
-- ML model optimized for speed
-
-### ✔ Maintainability
-- Modular code structure
-- Separation of concerns:
-  - Parser
-  - ML model
-  - API
-  - UI
-
-### ✔ Error Handling
-- Try-catch blocks implemented
-- Meaningful API error responses
-- Logging for debugging
-
----
-
-## 🛠 Tech Stack
-
-### Frontend:
-- React.js
-- Bootstrap
-- Chart.js
-
-### Backend:
-- Django
-- Python
-
-### Database:
-- MongoDB
-
-### Machine Learning:
-- Isolation Forest
-- TF-IDF Vectorizer
-
----
-
-## 🔄 System Workflow
-1. User uploads log file
-2. Logs are parsed using regex
-3. Features are extracted (numeric + text)
-4. ML model detects anomalies
-5. Results stored in MongoDB
-6. Dashboard displays insights and alerts
-
----
-
-## 📸 Screenshots
-(Add screenshots of:)
-- Dashboard
-- Analytics
-- Alerts
-
----
-
-## 🚀 Future Improvements
-- Real-time log streaming
-- User authentication system
-- Export reports (PDF/CSV)
-- Integration with monitoring tools
-
----
-
-## 📌 Conclusion
-This project demonstrates a scalable and intelligent log analysis system combining machine practical engineering solutions. It effectively detects anomalies and provides actionable insights for system monitoring.
+Kartik Deshmukh
