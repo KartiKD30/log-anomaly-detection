@@ -1,0 +1,107 @@
+/* FULL PAGE */
+.auth-page {
+display: flex;
+height: 100vh;
+font-family: 'Segoe UI', sans-serif;
+}
+
+/* LEFT SIDE (INSTAGRAM STYLE) */
+.auth-left {
+flex: 1;
+background: radial-gradient(circle at top left, #020617, #000000);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 80px;
+color: white;
+}
+
+.auth-left-content {
+max-width: 420px;
+}
+
+/* LOGO */
+.logo {
+font-size: 48px;
+font-weight: 700;
+margin-bottom: 30px;
+
+background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffff);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+/* HEADLINE */
+.headline {
+font-size: 36px;
+line-height: 1.4;
+font-weight: 500;
+}
+
+/* GRADIENT TEXT */
+.gradient-text {
+background: linear-gradient(90deg, #ff7a18, #ff00cc, #00c6ff);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+/* RIGHT SIDE */
+.auth-right {
+flex: 1;
+background: #111827;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+/* CARD */
+.auth-card {
+width: 100%;
+max-width: 360px;
+background: #1f2937;
+padding: 40px;
+border-radius: 16px;
+box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* TITLE */
+.auth-card h2 {
+color: white;
+margin-bottom: 25px;
+}
+
+/* INPUT */
+.auth-card input {
+width: 100%;
+padding: 14px;
+margin-bottom: 16px;
+border-radius: 10px;
+border: 1px solid #374151;
+background: #111827;
+color: white;
+font-size: 14px;
+}
+
+/* INPUT FOCUS */
+.auth-card input:focus {
+outline: none;
+border-color: #2563eb;
+}
+
+/* BUTTON */
+.auth-card button {
+width: 100%;
+padding: 14px;
+border-radius: 999px;
+border: none;
+background: #2563eb;
+color: white;
+font-weight: 600;
+cursor: pointer;
+transition: 0.3s;
+}
+
+/* BUTTON HOVER */
+.auth-card button:hover {
+background: #1d4ed8;
+}

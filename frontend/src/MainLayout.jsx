@@ -5,10 +5,12 @@ import Upload from "./pages/Upload";
 import Analytics from "./pages/Analytics";
 import History from "./pages/History";
 import Alerts from "./pages/Alerts";
+import { useTheme } from "./ThemeContext";
 
 function MainLayout({ onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
   const [alerts, setAlerts] = useState(null);
   const [alertCount, setAlertCount] = useState(0);
 
@@ -189,6 +191,15 @@ function MainLayout({ onLogout }) {
       </div>
 
       <div className="main">
+        <div className="main-header">
+          <button 
+            className="theme-toggle"
+            onClick={toggleTheme}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? "☀️" : "🌙"}
+          </button>
+        </div>
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/upload" element={<Upload />} />

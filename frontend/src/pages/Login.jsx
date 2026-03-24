@@ -1,23 +1,24 @@
 import { motion } from "framer-motion";
+import "./Login.css";
 
 function Login() {
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ height: "80vh" }}>
-      
+    <div className="login-wrapper">
       <motion.div
-        className="card p-4 shadow-lg"
-        style={{ width: "350px" }}
+        className="login-card"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
       >
-        <h3 className="text-center mb-3">Login</h3>
+        <div className="login-header">
+          <h3 className="login-title">Login</h3>
+        </div>
 
-        <input className="form-control mb-3" placeholder="Email" />
-        <input className="form-control mb-3" type="password" placeholder="Password" />
+        <input className="login-input" placeholder="Email" />
+        <input className="login-input" type="password" placeholder="Password" />
 
-        <button className="btn btn-primary w-100">Login</button>
+        <button className="login-button">Login</button>
       </motion.div>
-
     </div>
   );
 }
