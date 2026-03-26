@@ -156,7 +156,7 @@ def upload_file(request):
 
     results = df.to_dict(orient="records")
 
-    collection.delete_many({})
+    
 
     for log in results:
         collection.insert_one(dict(log))
