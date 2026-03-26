@@ -70,7 +70,7 @@ function MainLayout({ onLogout }) {
     <div className="layout">
       <div className="sidebar">
         <div className="logo">
-          <h2>🔍 LDS</h2>
+          <h2 className="logo-text">LDS</h2>
         </div>
 
         <nav>

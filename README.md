@@ -10,6 +10,65 @@ The project demonstrates integration of backend processing, machine learning, da
 
 ---
 
+## 🚀 How to Run the Project
+
+### 1. Clone Repository
+
+git clone <your-repo-link>
+cd log-anomaly-detection
+
+---
+
+### 2. Backend Setup
+
+cd backend
+
+pip install -r requirements.txt
+
+python manage.py migrate
+
+python manage.py runserver
+
+---
+
+### 3. Frontend Setup
+
+Open a new terminal:
+
+cd frontend
+
+npm install
+
+npm start
+
+---
+
+### 4. Access Application
+
+Frontend: http://localhost:3000
+Backend: http://127.0.0.1:8000
+
+---
+
+### 5. Additional Setup
+
+* Make sure MongoDB is installed and running
+* Create a `.env` file inside backend folder:
+
+EMAIL_HOST_USER=[your_email@gmail.com](mailto:your_email@gmail.com)
+EMAIL_HOST_PASSWORD=your_app_password
+
+---
+
+### 6. Usage
+
+* Enter email to receive OTP
+* Verify OTP to login
+* Upload log file
+* View anomaly detection results on dashboard
+
+---
+
 ## 🎯 Objectives
 
 * Automate log analysis
@@ -140,7 +199,7 @@ The system includes an OTP-based authentication mechanism:
 * System sends OTP via SMTP
 * OTP verification grants access
 
-This eliminates the need for password storage and demonstrates secure authentication concepts.
+OTP is stored in the database with expiry logic for improved reliability.
 
 ---
 
@@ -171,7 +230,6 @@ This eliminates the need for password storage and demonstrates secure authentica
 
 ## ⚠️ Limitations
 
-* OTP stored in memory
 * No real-time streaming
 * Basic authentication (no JWT/session)
 * Limited log format support

@@ -35,26 +35,20 @@ body {
 }
 
 .sidebar h2 {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   margin: 0;
-  padding: 15px 20px;
-  border-radius: 12px;
+  padding: 0;
   text-align: center;
-  backdrop-filter: blur(10px);
 
-  /* keep your glass background */
-  background: rgba(255, 255, 255, 0.15);
-
-  /* NEW: strong visible text */
   color: #ffffff;
 
-  /* glow for premium look */
-  text-shadow:
-    0 0 8px rgba(0, 168, 255, 0.8),
-    0 0 16px rgba(0, 102, 255, 0.6);
-
   letter-spacing: 1px;
+
+  /* subtle glow */
+  text-shadow:
+    0 0 6px rgba(0, 168, 255, 0.7),
+    0 0 12px rgba(0, 102, 255, 0.5);
 }
 .sidebar nav {
   display: flex;
@@ -93,9 +87,12 @@ body {
 
 /* LOGO */
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 30px;
+
+  /* REMOVE THIS PROBLEM */
+  background: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
 
 .logo-icon {
@@ -464,30 +461,17 @@ tr:hover {
   background: rgba(255, 193, 7, 0.15);
 }
 
-
-/* FORCE LOGO STYLE (HIGH PRIORITY) */
-.logo h2 {
-  font-size: 28px !important;
-  font-weight: 700 !important;
-  color: #ffffff !important;
-
-  background: rgba(255, 255, 255, 0.15) !important;
-  padding: 15px 20px !important;
-  border-radius: 12px !important;
-
+/* LDS TITLE */
+.sidebar .logo {
+  margin-bottom: 30px;
   text-align: center;
-  letter-spacing: 1px;
-
-  /* glow */
-  text-shadow:
-    0 0 10px rgba(0, 168, 255, 0.9),
-    0 0 20px rgba(0, 102, 255, 0.7);
 }
 
-.logo {
-  margin-bottom: 20px;
+.sidebar .logo h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #e0f2fe;
+  margin: 0;
 }
 
-.logo h2 {
-  color: red !important;
-}

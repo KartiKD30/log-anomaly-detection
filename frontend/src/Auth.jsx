@@ -44,7 +44,7 @@ function Auth({ onLogin }) {
       <div className="auth-left">
   <div className="auth-left-content">
 
-    <h1 className="logo">LDS</h1>
+    <h1 className="auth-logo">LDS</h1>
 
     <p className="headline">
       See system insights from your{" "}

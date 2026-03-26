@@ -20,8 +20,8 @@ color: white;
 max-width: 420px;
 }
 
-/* LOGO */
-.logo {
+/* 🔥 FIX: rename logo class so it doesn't affect sidebar */
+.auth-logo {
 font-size: 48px;
 font-weight: 700;
 margin-bottom: 30px;

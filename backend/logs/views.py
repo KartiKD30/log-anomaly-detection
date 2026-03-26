@@ -6,6 +6,7 @@ import re
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
+from django.utils import timezone
 
 import pandas as pd
 import numpy as np
@@ -15,29 +16,21 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from .mongo import collection
 from bson import ObjectId
+from .models import OTP   # ✅ NEW
 
 
 # =========================
-# STORAGE
-# =========================
-users = {}
-otp_store = {}
-
-
-# =========================
-# LOGIN WITH OTP 
+# LOGIN WITH OTP (STORE IN DB)
 # =========================
 @csrf_exempt
 def login_with_otp(request):
     data = json.loads(request.body)
     email = data.get("email")
 
-    # auto-create user if not exists
-    if email not in users:
-        users[email] = True
-
     otp = str(random.randint(100000, 999999))
-    otp_store[email] = otp
+
+    # save OTP in database
+    OTP.objects.create(email=email, otp=otp)
 
     send_mail(
         "Login OTP",
@@ -51,7 +44,7 @@ def login_with_otp(request):
 
 
 # =========================
-# VERIFY OTP → LOGIN SUCCESS
+# VERIFY OTP WITH EXPIRY
 # =========================
 @csrf_exempt
 def verify_otp(request):
@@ -60,8 +53,18 @@ def verify_otp(request):
     email = data.get("email")
     otp = data.get("otp")
 
-    if otp_store.get(email) == otp:
-        del otp_store[email]
+    # get latest OTP for that email
+    record = OTP.objects.filter(email=email).order_by('-created_at').first()
+
+    if not record:
+        return JsonResponse({"error": "No OTP found"}, status=400)
+
+    # check expiry (5 min)
+    if not record.is_valid():
+        return JsonResponse({"error": "OTP expired"}, status=400)
+
+    # match OTP
+    if record.otp == otp:
         return JsonResponse({"success": True})
     else:
         return JsonResponse({"error": "Invalid OTP"}, status=400)
