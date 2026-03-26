@@ -16,20 +16,33 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from .mongo import collection
 from bson import ObjectId
-from .models import OTP   # ✅ NEW
+from .models import OTP
+from datetime import timedelta
 
 
-# =========================
-# LOGIN WITH OTP (STORE IN DB)
-# =========================
 @csrf_exempt
 def login_with_otp(request):
     data = json.loads(request.body)
     email = data.get("email")
 
+    if not email:
+        return JsonResponse({"error": "Email required"}, status=400)
+
+    now = timezone.now()
+
+    recent_otps = OTP.objects.filter(
+        email=email,
+        created_at__gte=now - timedelta(minutes=5)
+    ).count()
+
+    if recent_otps >= 3:
+        return JsonResponse(
+            {"error": "Too many OTP requests. Try again after 5 minutes."},
+            status=429
+        )
+
     otp = str(random.randint(100000, 999999))
 
-    # save OTP in database
     OTP.objects.create(email=email, otp=otp)
 
     send_mail(
@@ -40,12 +53,9 @@ def login_with_otp(request):
         fail_silently=False,
     )
 
-    return JsonResponse({"message": "OTP sent"})
+    return JsonResponse({"message": "OTP sent successfully"})
 
 
-# =========================
-# VERIFY OTP WITH EXPIRY
-# =========================
 @csrf_exempt
 def verify_otp(request):
     data = json.loads(request.body)
@@ -53,26 +63,23 @@ def verify_otp(request):
     email = data.get("email")
     otp = data.get("otp")
 
-    # get latest OTP for that email
+    if not email or not otp:
+        return JsonResponse({"error": "Missing fields"}, status=400)
+
     record = OTP.objects.filter(email=email).order_by('-created_at').first()
 
     if not record:
         return JsonResponse({"error": "No OTP found"}, status=400)
 
-    # check expiry (5 min)
     if not record.is_valid():
         return JsonResponse({"error": "OTP expired"}, status=400)
 
-    # match OTP
     if record.otp == otp:
         return JsonResponse({"success": True})
     else:
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
 
-# =========================
-# LOG UPLOAD (ML)
-# =========================
 @csrf_exempt
 def upload_file(request):
     if request.method != "POST":
@@ -157,9 +164,6 @@ def upload_file(request):
     return JsonResponse({"results": results})
 
 
-# =========================
-# GET LOGS
-# =========================
 def get_logs(request):
     logs = list(collection.find().limit(1000))
 

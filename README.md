@@ -17,7 +17,7 @@ The project demonstrates integration of backend processing, machine learning, da
 git clone <your-repo-link>
 cd log-anomaly-detection
 
----
+
 
 ### 2. Backend Setup
 
@@ -29,7 +29,7 @@ python manage.py migrate
 
 python manage.py runserver
 
----
+
 
 ### 3. Frontend Setup
 
@@ -41,14 +41,14 @@ npm install
 
 npm start
 
----
+
 
 ### 4. Access Application
 
 Frontend: http://localhost:3000
 Backend: http://127.0.0.1:8000
 
----
+
 
 ### 5. Additional Setup
 
@@ -58,7 +58,7 @@ Backend: http://127.0.0.1:8000
 EMAIL_HOST_USER=[your_email@gmail.com](mailto:your_email@gmail.com)
 EMAIL_HOST_PASSWORD=your_app_password
 
----
+
 
 ### 6. Usage
 
@@ -67,7 +67,7 @@ EMAIL_HOST_PASSWORD=your_app_password
 * Upload log file
 * View anomaly detection results on dashboard
 
----
+-
 
 ## 🎯 Objectives
 
